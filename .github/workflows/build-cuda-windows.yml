@@ -5,30 +5,22 @@ on:
 
 jobs:
   build:
-    name: Build llama-server CUDA
     runs-on: windows-2022
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup MSVC
         uses: ilammy/msvc-dev-cmd@v1
-
-      - name: Install CUDA
-        run: |
-          choco install cuda -version 12.4.1 --yes
-          $env:PATH = "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.4\bin;$env:PATH"
 
       - name: Install CMake
         uses: lukka/get-cmake@latest
 
       - name: Build
-        run: |
-          cmake -S . -B build -G "Ninja" -DGGML_CUDA=ON -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --config Release -j 7
+        run: cmake --build build --config Release
+        shell: pwsh
 
-      - name: Upload artifact
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: llama-server-cuda
