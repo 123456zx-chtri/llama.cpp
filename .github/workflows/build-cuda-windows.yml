@@ -1,4 +1,4 @@
-name: Build CUDA
+name: Build CUDA Windows
 
 on:
   workflow_dispatch:
@@ -17,10 +17,19 @@ jobs:
       - name: Install CMake
         uses: lukka/get-cmake@latest
 
-      - name: Build
+      - name: Install CUDA
+        run: |
+          choco install cuda -version 12.4.1 --yes
+          $env:Path += ";C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.4\bin"
+          nvcc --version
+
+      - name: Configure
         run: |
           cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -DGGML_CUDA=ON -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --config Release --parallel 4
+        shell: pwsh
+
+      - name: Build
+        run: cmake --build build --config Release --parallel 4
         shell: pwsh
 
       - name: Upload
